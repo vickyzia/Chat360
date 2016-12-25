@@ -1,0 +1,12 @@
+﻿@model Chat360Client.Models.LoginUserModel
+
+@{
+    ViewBag.Title = "SignIn";
+}
+
+<form class="form-auth" action="@Url.Action("ProcessSignIn")" method ="POST">
+        <h2>Sign In</h2>
+        <input type="username" name="username" placeholder="Username" class="form-control"><br>
+        <input type="password" name="password" placeholder="Password" class="form-control"><br>
+        <input type="submit" value="Log in" class="btn btn-primary" />
+</form>
