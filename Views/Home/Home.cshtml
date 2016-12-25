@@ -102,7 +102,6 @@
                         var val = confirm("Call coming from " + data.username + ". Click Okay to accept and Cancel to reject");
                         if (val == true) {
                             call.answer(window.localStream);
-
                             step3(call);
                         }
                         else {
@@ -170,7 +169,10 @@
                     window.existingCall.close();
                 }
                 // Wait for stream on the call, then set peer video display
-                
+                call.on('stream', function (stream) {
+                    $('#their-video').prop('src', URL.createObjectURL(stream));
+                    step3(call);
+                });
                 // UI stuff
                 window.existingCall = call;
                 $('#their-id').text(call.peer);
@@ -196,10 +198,7 @@
                         }
 
                         var call = peer.call(data.apiKey, window.localStream);
-                        call.on('stream', function (stream) {
-                            $('#their-video').prop('src', URL.createObjectURL(stream));
-                            step3(call);
-                        });
+                        
                         
 
                     }
@@ -264,7 +263,7 @@
 
         <!-- Call in progress -->
         <div id="step3">
-          <p>Currently in call with <span id="their-id">...</span></p>
+          
           <p><a href="#" class="pure-button pure-button-error" id="end-call">End call</a></p>
         </div>
         
