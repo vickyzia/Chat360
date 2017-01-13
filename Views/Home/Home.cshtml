@@ -106,6 +106,7 @@
                             $('#infoMessage').text('');
                             step3(call);
                             $('#video-container').show();
+                            $('#callText').text('Currently in call with ' + data.username);
                             $('#mainPage').hide();
                             $('#mainNav').hide();
                         }
@@ -347,7 +348,7 @@
 						Disconnect
 					</a>
 				</center>
-            <span style="display:block;">Currently in call with Username</span>
+            <span id="callText" style="display:block;"></span>
 		</div>
 	</div>
 <script src="~/Scripts/home.js"></script>
