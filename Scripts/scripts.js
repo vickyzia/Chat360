@@ -92,9 +92,9 @@ jQuery(document).ready(function () {
               type: "POST",
               async: true,
               url: "/Account/validateUsername", // script to validate in server side
-              data: "email=" + value,
+              data: "username=" + value,
               success: function (data) {
-                  if (data == "true") {
+                  if (data == true) {
                       $('#reg-form-email').removeClass('input-error');
                       registered = false;
                       $('#error-message').hide();
