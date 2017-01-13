@@ -241,6 +241,7 @@
             if (inCall)
             {
                 $('#infoMessage').text('Already in a call');
+                return;
             }
             $.ajax({
                 type: "GET",
