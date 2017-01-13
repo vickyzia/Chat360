@@ -90,7 +90,7 @@ jQuery(document).ready(function () {
           var value = $('#reg-form-username').val();
           $.ajax({
               type: "POST",
-              async: false,
+              async: true,
               url: "/Account/validateUsername", // script to validate in server side
               data: "email=" + value,
               success: function (data) {
