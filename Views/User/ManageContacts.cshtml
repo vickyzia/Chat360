@@ -1,0 +1,299 @@
+﻿@model Chat360Client.Models.ManageContactModel
+@{
+    ViewBag.Title = "Manage Contacts";
+    int requestCountId = 0;
+    int contactCountId= 0;
+    ViewBag.RequestCount = Model.Requests != null ? Model.Requests.Count : 0;
+}
+
+<script>
+    $(document).ready(function()
+    {
+        $('#contactsTab').show();
+        $('#searchTab').hide();
+        $('#requestsTab').hide();
+        $('#searchBox').keyup(SearchQuery);
+
+    });
+    $('#contactsLink').on("click",function(){
+        $('#contactsTab').show();
+        $('#searchTab').hide();
+        $('#requestsTab').hide();
+
+        $('#searchLink').removeClass('active');
+        $('#contactsLink').addClass('active');
+        $('#requestsLink').removeClass('active');
+    });
+    $('#searchLink').on("click",function(){
+        $('#contactsTab').hide();
+        $('#searchTab').show();
+        $('#requestsTab').hide();
+
+        $('#searchLink').addClass('active');
+        $('#contactsLink').removeClass('active');
+        $('#requestsLink').removeClass('active');
+    });
+    $('#requestsLink').on("click",function(){
+        $('#contactsTab').hide();
+        $('#searchTab').hide();
+        $('#requestsTab').show();
+
+        $('#searchLink').removeClass('active');
+        $('#contactsLink').removeClass('active');
+        $('#requestsLink').addClass('active');
+    });
+    function SureDialog(username,id)
+    {
+        $('#yesButton').attr('data-username', username);
+        $('#yesButton').attr('data-id', id);
+        $('#sureDialog').show();
+
+    }
+    $('#yesButton').on("click",function(){
+        var username = $('#yesButton').attr('data-username');
+        var id = $('#yesButton').attr('data-id', id);
+        $('#sureDialog').hide();
+        Delete(username, id);
+    });
+    function Delete(username, id) {
+        $.ajax({
+            method: "DELETE",
+            url: '@Url.Action("DeleteContact")',
+            data: { username: username },
+            success: function (reply) {
+                if (reply.status == 200) {
+                    //Successfully deleted
+                    
+                    $('#con-' + id).find('a').text('Contact Delete Successfully');
+                    setTimeout(function () { $('#con-' + id).fadeOut(); }, 1000);
+                }
+                else if (reply.status == 401) {
+                    //Unauthorized
+                }
+                else if (reply.status == 404) {
+                    //contact not found.
+                }
+            }
+        });
+    }
+    function RejectRequest(username, id) {
+        $.ajax({
+            method: "POST",
+            url: '@Url.Action("RejectRequest")',
+            data: { username: username },
+            success: function (reply) {
+                if (reply.status == @Chat360Client.RequestResponseValues.RequestRejected) {
+                    //Successfully deleted
+
+                    setTimeout(function () { $('#req-' + id).fadeOut(); }, 1000);
+                }
+                else if (reply.status == 401) {
+                    //Unauthorized
+                }
+                else if (reply.status == 404) {
+                    //contact not found.
+                }
+            }
+        });
+    }
+    function AcceptRequest(username, id) {
+        $.ajax({
+            method: "POST",
+            url: '@Url.Action("AcceptRequest")',
+            data: { username: username },
+            success: function (reply) {
+                if (reply.status == @Chat360Client.RequestResponseValues.ReuqestAccepted) {
+                    //Successfully deleted
+
+                    setTimeout(function () { $('#req-' + id).fadeOut(); }, 1000);
+                }
+                else if (reply.status == 401) {
+                    //Unauthorized
+                }
+                else if (reply.status == 404) {
+                    //contact not found.
+                }
+            }
+        });
+    }
+    function AddContact(username, id){
+        $.ajax({
+            method: "POST",
+            url: '@Url.Action("AddContact")',
+            data: { username: username },
+            success: function (reply) {
+                if (reply.status == @Chat360Client.RequestStatusValues.RequestSentSuccessfully) 
+                {
+                    //Successfully sent contact request.
+                    var anchor = $('#search-' + id).find('a');
+                    anchor.attr('onclick', '');
+                    anchor.text("Request Sent");
+                }
+                
+            }
+        });
+    }
+        function SearchQuery() {
+            var key = $('#searchBox').val();
+        $.ajax({    
+            method: "POST",
+            url: '@Url.Action("SearchUsers")',
+            data: { key: key },
+            success: function (data) {
+                $('#searchList').empty();
+                if (!$.trim(data)) {
+                    document.getElementById("searchList").innerHTML = " ";
+                }
+                var d = jQuery("#searchBox").val();
+                var v = data;
+                var text = "";
+                var html = "";
+                var h = "";
+                if (v.length > 0) {
+                    for (var i = 0; i < v.length; i++) {
+
+                        if (v[i].status == @Chat360Client.ContactStatusValues.ContactNotAdded) 
+                        {
+                            var x = "Add Contact";
+                            h = "<a type=\"button\"class=\"pull-right btn btn-default joinButton\" onclick=\"return AddContact('"+v[i].user.username + "',"+i+")\">" + x + "</a>";
+
+                        }
+                         else if (v[i].status == @Chat360Client.ContactStatusValues.ContactAlreadyAdded) {
+                        h="";
+                          
+                        } else if(v[i].status == @Chat360Client.ContactStatusValues.RequestStatusPending){
+                            x = "Request Sent";
+                            h = "<p type=\"button\"class=\"pull-right btn btn-default joinButton\">" + x + "</p>";
+                        }
+                    html += "<li class=\"listItem\" id=\"search-"+i+"\"" +">" +
+
+                    "<div class=\"list-group-item\">"+
+                    "<div class=\"row\">" +
+                        "<h3 class=\"list-group-item-heading col-md-8\" style=\"display:inline; float:left\">" + v[i].user.username + "</h3>" + h +
+                        "<p class=\"col-xs-4\">"+  "</p>" +
+
+
+                    "</div>" +
+                    
+                    //"<div class=\"row\">" +
+
+                    //    "<small class=\"pull-right\">Created By:" + "</small>" +
+                    //"</div>" +
+
+                    "</div>"+
+                "</li>";
+                    }
+
+                }
+                else {
+                    html = "<li class=\"listItem list-group-item\"><h3> No Results To Show</h3></li>"
+                }
+                $('#searchList').html(html);
+            }
+        });
+    }
+</script>
+<!-- Plugin CSS -->
+
+    <!-- Custom CSS -->
+
+<div class="container" id="contactsTab">
+    
+		<ul class="list-group" style="list-style: none;">
+            @foreach(var contact in Model.Contacts){
+			<li class="listItem " id="con-@contactCountId">
+				<div class="list-group-item">
+					<div class="row">
+						<p class="list-group-item-heading col-md-11" style="font-weight:bold;">@contact.username.ToUpperInvariant()</p>
+						<i class="fa fa-2x fa-unchecked text-primary col-md-1"></i>
+						<a class="pull-right btn btn-default joinButton" onclick="return Delete('@contact.username', @contactCountId)" href ="#">Delete</a>
+					</div>
+					<div class="row">
+						<small class="col-xs-12"> Lahore, Pakistan</small>
+					</div>
+			    </div>
+			
+			</li>
+                contactCountId++;
+            }
+            @if(Model.Contacts.Count == 0)
+            {
+                <li class="listItem">
+                    <span>No contacts to show</span>
+                </li>
+            }
+		</ul>
+    
+    
+	</div>
+	
+	<div class="container" id="requestsTab">
+		<ul class="list-group" style="list-style: none;">
+
+            @foreach(var request in Model.Requests){
+				<li class="listItem" id="req-@requestCountId">
+				    <div class="list-group-item">				<div class="row">
+						<p class="list-group-item-heading col-md-5" style="font-weight:bold; margin-top:5px;">@request.user.username.ToUpperInvariant()</p>
+						
+						<a onclick="return RejectRequest('@request.user.username', @requestCountId)" href="#" class="pull-right btn btn-reject joinButton">Reject</a>
+						<a onclick="return AcceptRequest('@request.user.username', @requestCountId)" href="#" class="pull-right btn btn-default joinButton">Accept</a>
+					</div>
+					<div class="row">
+						<small class="col-xs-12"> Lahore, Pakistan</small>
+					</div>
+					<div class="row">
+						<small class="col-xs-4">@request.date</small>
+					</div>
+                        </div>
+	
+				
+			</li>
+                    requestCountId++;
+                }
+            @if (Model.Requests.Count == 0) 
+            { 
+                <li class="listItem" >
+                    No Requests to show.
+                    </li>
+            }
+		</ul>
+	</div>
+	
+	<div class="container" id="searchTab">
+		<div id="searchDiv">
+					<form class="input-group">
+					  <input type="text" class="form-control" placeholder="Search for..." id="searchBox">
+					  <span class="input-group-btn">
+						<button class="btn btn-default"  >Go!</button>
+					  </span>
+					<form><!-- /input-group -->
+
+                
+
+		</div>
+        <div class="">
+		<ul class="list-group" style="list-style: none;" id="searchList">
+				   
+			    </ul>
+	</div>
+	</div>
+	
+	<div id="sureDialog" class="modal fade" role="dialog">
+  	    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Delete Contact</h4>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to Delete this contact<p>
+          </div>
+          <div class="modal-footer">
+		    <button id="yesButton" onclick="DeleteContact" type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          </div>
+    </div>
+
+  </div>

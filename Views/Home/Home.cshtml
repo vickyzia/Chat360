@@ -1,20 +1,20 @@
-﻿@model List<string>
+﻿@model List<Chat360Client.Models.UserModel>
 @{
     ViewBag.Title = "Home";
 }
 
-
-<h2>Home</h2>
+ <link rel="stylesheet" href="~/Content/home.css">   
 <script>
     // Compatibility shim
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     // PeerJS object
     var peer = null;
+    var callConnected = false;
+    var inCall = false;
+    var checkTimeOut = true;
     connectPeer();
     
     // Receiving a call
-    
-
         
     setInterval(function () {
         if (window.existingCall != null && window.existingCall.open == true) {
@@ -36,10 +36,9 @@
     }
     function PeerClose() {
         var x = 0;
+        
     }
-        
-         
-        
+       
         // Click handlers setup
         $(function () {
             $('#make-call').click(function () {
@@ -97,22 +96,28 @@
             });
             peer.on('call', function (call) {
                 // Answer the call automatically (instead of prompting user) for demo purposes
+                console.log("Incoming Call");
                 $.get("@Url.Action("GetUserFromApiKey", "Account")", { apikey: call.peer }, function (data) {
                     if (data.status == 200) {
                         var val = confirm("Call coming from " + data.username + ". Click Okay to accept and Cancel to reject");
                         if (val == true) {
                             call.answer(window.localStream);
-
+                            callConnected = true;
+                            $('#infoMessage').text('');
                             step3(call);
+                            $('#video-container').show();
+                            $('#mainPage').hide();
+                            $('#mainNav').hide();
                         }
                         else {
                             //reject call
+                            call.close();
                         }
                     }
                 });
             });
             peer.on('error', function   (err) {
-
+                console.log(err);
                 if (err.type == 'browser-incompatible') {
                     console.log("Browser is incompatible for Webrtc");
                 }
@@ -157,23 +162,68 @@
             }, function () { $('#step1-error').show(); });
         }
         function step2() {
+            //End call
             $('#step1, #step3').hide();
             $('#step2').show();
+            $('#mainPage').show();
+            $('#mainNav').show();
+            console.log("Call Closed");
+            $('#video-container').hide();
+            $('.list-group').find('a').removeClass('active');
+            $('#centerDiv').hide();
+            var c = @Model.Count;
+            if(c==0){   
+            }
+               
+            
+            else
+            {    
+                $('#infoMessage').text('Select a user to make call');
+            }
+            inCall = false;
+            callConnected = false;
             peer.destroy();
             connectPeer();
-
         }
         function step3(call) {
             // Hang up on an existing call if present
-            if (call != null) {
+            if (call != null )
+            {
                 if (window.existingCall) {
                     window.existingCall.close();
                 }
                 // Wait for stream on the call, then set peer video display
                 call.on('stream', function (stream) {
                     $('#their-video').prop('src', URL.createObjectURL(stream));
-                    
+                    $('#mainPage').hide();
+                    $('#mainNav').hide();
+                    $('#video-container').show();
+                    $('#infoMessage').text('');
+                    callConnected = true;
+                    checkTimeOut = false;
+
                 });
+                call.on('error', function (error) {
+                    console.log(error);
+                });
+                inCall = true;
+                setTimeout(function () {
+                    if (callConnected == false && checkTimeOut == true)
+                    {
+                        //unable to connect call.
+                        $('#infoMessage').text('Unable to connect the call');
+                        if (window.existingCall)
+                        {
+                            window.existingCall.close();
+                        }
+                        inCall = false;
+                    }
+                    checkTimeOut = true;
+
+                }, 15000);
+
+                
+                
                 // UI stuff
                 window.existingCall = call;
                 $('#their-id').text(call.peer);
@@ -182,26 +232,33 @@
                 $('#step3').show();
             }
             else {
-                alert("Unable to connect.");
+                $('#infoMessage').text('Unable to connect the call');
             }
         }
 
         function makeCall(username) {
-
+            if (inCall)
+            {
+                $('#infoMessage').text('Already in a call');
+            }
             $.ajax({
                 type: "GET",
                 url: "@Url.Action("GetUserApiKey", "Account")",
                 data: { username: username },
                 success: function (data) {
-                    if (data !== "" && data != "") {
+                    if (data !== null && data.apiKey != null) {
+
                         if (!IsPeerConnected()) {
                             connectPeer();
                         }
 
                         var call = peer.call(data.apiKey, window.localStream);
-                        
+                        $('#infoMessage').text("Calling...");
                         step3(call);
 
+                    }
+                    else {
+                        $('#infoMessage').text("User not available at this moment.");
                     }
                 }
             });
@@ -221,56 +278,76 @@
             return false;
         }
     
+
+        
   </script>
 
 
-<ul style="float:left">
-@foreach(var user in Model){
-    
-    <li style="padding:10px">
-        <span>@user</span>
-        <button class="btn" onclick="return makeCall('@user')">Call</button>
-    </li>
+	<div id="mainPage" style="margin-left:0px; margin-right:0px; margin-bottom:0px; height:100%">
+		
+			<div class=" left col-xs-5 col-sm-3 col-md-3 col-lg-3" style="height: 92vh; padding:0px; margin:0px;">
+				
+				<div class="list-group" style="height: 92vh; min-height:500px; overflow:auto; margin:0px; padding:0px; border-right:2px solid #d2d8df; background-color:white;" >
+					@foreach (var user in @Model)
+                     {
+                        
+                        <a href="#" class="list-group-item" style="border-bottom:1px solid #d2d8df" data-username="@user.username" data-img="@user.imageUrl">
+                            
+                            @if(string.IsNullOrEmpty(user.imageUrl))
+                            {
+                               <img class="img-circle left" src="@Url.Content("~/Images/defaultUser.png")" width="60" height="60"/>
+                            }
+                            else
+                            {
+                               <img class="img-circle left" src="@user.imageUrl" width="60" height="60"/>
 
-    
-}
-    </ul>
+                            }
+						    <span style="padding:10px;"> @user.username </span>
+                                
+					    </a>
+                    
+                     }
+                    
+					</div>
+			</div>
+		
+			<div  class="span3 col-xs-7 col-sm-9 col-md-9 col-lg-9" style="max-height:92vh;">
+				<center id="center" style="padding-top:50px">
+                    <div id="centerDiv">
+					    <img src="" name="aboutme" width="140" height="140" id="img-circle" class="img-circle">
+					    <h3 id="username"></h3>
+					    <a class="btn btn-primary btn-xlg"  onclick="return makeCall(selectedUser)" style="padding:20px;background-color:green; margin-top:10px;">
+						    <span class="glyphicon glyphicon-earphone" style="padding-left:5px; padding-right:5px;"></span>
+						    Call
+					    </a>
+					</div>
+                    @if(Model.Count == 0)
+                    {		
+                        <span id="infoMessage" style="margin-top:10px; display:block;"> No Contacts to show go to <a href="@Url.Action("ManageContacts","User")">Manage Contacts </a> to add contacts</span>
 
-<div class="pure-g" style="float:right">
+                    }
+                    else{
+                        <span id="infoMessage" style="margin-top:10px; display:block;"> Select a contact to make call.</span>
+                    }
+				</center>
+			</div>
+		
+	</div>
 
-      <!-- Video area -->
-      <div class="pure-u-2-3" id="video-container">
-        <video id="their-video" autoplay></video>
+
+		 
+	<div id="video-container">
+		<video id="their-video" autoplay></video>
         <video id="my-video" muted="true" autoplay></video>
-      </div>
+		<div id=disconnectCall>
+			<center>
+				<a  class="btn btn-primary btn-xlg" onclick="return step2()" style="padding:20px;background-color:red; margin-top:10px;">
 
-      <!-- Steps -->
-      <div class="pure-u-1-3">
-        <h2>Chat 360</h2>
-
-        <!-- Get local audio/video stream -->
-        <div id="step1">
-          <p>Please click `allow` on the top of the screen so we can access your webcam and microphone for calls.</p>
-          <div id="step1-error">
-            <p>Failed to access the webcam and microphone. Make sure to run this demo on an http server and click allow when asked for permission by the browser.</p>
-            <a href="#" class="pure-button pure-button-error" id="step1-retry">Try again</a>
-          </div>
-        </div>
-
-        <!-- Make calls to others -->
-        <div id="step2">
-         
-        </div>
-
-        <!-- Call in progress -->
-        <div id="step3">
-          <p>Currently in call with <span id="their-id">...</span></p>
-          <p><a href="#" class="pure-button pure-button-error" id="end-call">End call</a></p>
-        </div>
-        
-          <div id="callerDiv">
-              <p id="callerMessage"> </p>
-              <button ></button>
-          </div>
-      </div>
-</div>
+						<span class="glyphicon glyphicon-earphone" style="padding-left:5px; padding-right:5px;"></span>
+						Disconnect
+					</a>
+				</center>
+            <span style="display:block;">Currently in call with Username</span>
+		</div>
+	</div>
+<script src="~/Scripts/home.js"></script>

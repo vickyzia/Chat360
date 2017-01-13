@@ -1,0 +1,160 @@
+﻿@model Chat360Client.Models.LoginUserModel
+
+@{
+    ViewBag.Title = "SignIn Or SignUp";
+    Layout = "";
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>@ViewBag.Title</title>
+		
+		<script type="text/javascript" src="~/Scripts/jquery-2.1.4.js"></script>
+        <script type="text/javascript" src="~/Scripts/validation.min.js"></script>
+        <script src="~/Scripts/bootstrap.min.js"></script>
+        <script src="~/Scripts/scripts.js"></script>
+        <!-- CSS -->
+        <link rel="stylesheet" href="~/Content/font3.css">
+        <link rel="stylesheet" href="~/Content/bootstrap.min.css">
+        <link rel="stylesheet" href="~/Content/font-awesome.min.css">
+		<link rel="stylesheet" href="~/Content/form-elements.css">
+        <link rel="stylesheet" href="~/Content/style.css">
+
+
+    </head>
+
+    <body>
+
+        <!-- Top content -->
+        <div class="top-content">
+        	
+            <div class="inner-bg">
+                <div class="container">
+                	
+                    <div class="row">
+                        <div class="col-sm-8 col-sm-offset-2 text">
+                            <h1>Join Us now...Or Login if you are already a member!</h1>
+                            <div class="description">
+                            	<p>
+	                            	
+                            	</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-sm-5">
+                        	
+                        	<div class="form-box">
+	                        	<div class="form-top">
+	                        		<div class="form-top-left">
+	                        			<h3>Login to our site</h3>
+	                            		<p>Enter Email and Password to log on:</p>
+	                        		</div>
+	                        		<div class="form-top-right">
+	                        			<i class="fa fa-key"></i>
+	                        		</div>
+	                            </div>
+	                            <div class="form-bottom">
+                                    
+                                    @using (Html.BeginForm("ProcessSignIn", "Account", FormMethod.Post, new { role = "form", @class = "login-form" }))
+                                    {
+				                   
+				                    	<div class="form-group">
+                                            @Html.LabelFor(x => x.username, new { @class = "sr-only" })
+				                        	@Html.TextBoxFor(x => x.username, null, new { type = "text", id = "username", placeholder = "Username...", @class = "form-username form-control" })
+				                        </div>
+				                        <div class="form-group">
+                                             @Html.LabelFor(x => x.password, new { @class = "sr-only" })
+
+                                            @Html.PasswordFor(x => x.password, new { @class = "form-password form-control", id = "form-password", placeholder = "password..." })
+		                        	
+				                            @Html.ValidationMessageFor(x => x.signIn, null, new { style="color: red"})
+                                        </div>
+										
+				                        <button type="submit" id="loginButton" class="btn">Sign in!</button>
+                                    }
+			                    </div>
+		                    </div>
+		                
+		                	
+	                        
+                        </div>
+                        
+                        <div class="col-sm-1 middle-border"></div>
+                        <div class="col-sm-1"></div>
+                        	
+                        <div class="col-sm-5">
+                        	
+                        	<div class="form-box">
+                        		<div class="form-top">
+	                        		<div class="form-top-left">
+	                        			<h3>Sign up now</h3>
+	                            		<p>Fill in the form to join us</p>
+	                        		</div>
+	                        		<div class="form-top-right">
+	                        			<i class="fa fa-pencil"></i>
+	                        		</div>
+	                            </div>
+	                            <div class="form-bottom">
+                                    
+                                    @using (Html.BeginForm("ProcessSignUp", "Account", FormMethod.Post, new { role = "form", @class = "registration-form", id = "reg-form" }))
+                                    {
+
+				                    	<div class="form-group">
+                                            @Html.LabelFor(x=>x.username, new {@class="sr-only"})
+                                            @Html.TextBoxFor(x=>x.username, null, new{ type="text", id="reg-form-username", placeholder="Username...", @class="reg-form-username form-control"})
+                                            @Html.ValidationMessageFor(x => x.username)
+				                        </div>
+
+										<div class="form-group">
+                                            @Html.LabelFor(x=>x.password, new {@class="sr-only"})
+                                            @Html.TextBoxFor(x=>x.password, null, new{ type="password", id="form-password", placeholder="Password...", @class="form-password form-control"})
+				                            @Html.ValidationMessageFor(x => x.password, null, new { style="color: red", id="error-message"})
+				                        </div>
+
+				                        <button type="submit" class="btn">Sign me up!</button>
+                                        
+                                    }
+			                    </div>
+                        	</div>
+                        	
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Footer -->
+        <footer>
+        	<div class="container">
+        		<div class="row">
+        			
+        			<div class="col-sm-8 col-sm-offset-2">
+        				<div class="footer-border"></div>
+        				
+        			</div>
+        			
+        		</div>
+        	</div>
+        </footer>
+
+        <!-- Javascript -->
+        
+        
+        <!--[if lt IE 10]>
+            <script src="assets/js/placeholder.js"></script>
+        <![endif]-->
+
+    </body>
+
+</html>

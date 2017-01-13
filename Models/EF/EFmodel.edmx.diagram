@@ -6,7 +6,14 @@
     <edmx:Diagrams>
       <Diagram DiagramId="9acc7aade3154f80b0a65e2754c1fc58" Name="Diagram1">
         <EntityTypeShape EntityType="DatabaseModel.User" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-      </Diagram>
+        <EntityTypeShape EntityType="DatabaseModel.Contact" Width="1.5" PointX="4" PointY="3" />
+        <AssociationConnector Association="DatabaseModel.ContactId_Foreign_Key" />
+        <AssociationConnector Association="DatabaseModel.UserId_Foreign_Key" />
+        <EntityTypeShape EntityType="DatabaseModel.Request" Width="1.5" PointX="4.75" PointY="0.5" />
+        <AssociationConnector Association="DatabaseModel.RecieverId_User_Foreign_Key" />
+        <AssociationConnector Association="DatabaseModel.SenderId_User_Foreign_Key" />
+        <AssociationConnector Association="DatabaseModel.ContactId_Foreign_Key1" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>
