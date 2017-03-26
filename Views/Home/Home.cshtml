@@ -14,8 +14,17 @@
     var checkTimeOut = true;
     connectPeer();
     
+    var connectedPeers = {};
+
     // Receiving a call
         
+    $(document).ready(function(){
+        $('#sendCordinates').on('click', function(){
+            var d = new Date();
+            window.dataConnection.send(peer.id + ":"+ d.getTime());
+          
+        });
+    });
     setInterval(function () {
         if (window.existingCall != null && window.existingCall.open == true) {
             //call is open don't update the id
@@ -83,7 +92,10 @@
 
         }
         function IntiliazePeer() {
-            peer = new Peer({ host: 'chat-360.herokuapp.com', secure: true, port: 443, key: 'peerjs', debug: 3 });
+            
+            if(window.dataConnection!=null)
+                window.dataConnection.close();
+            peer = new Peer({host: 'chat-360.herokuapp.com', secure: true, port: 443, key: 'peerjs', debug: 3 });
            
             peer.on('open', function() {
                 $('#my-id').text(peer.id);
@@ -94,6 +106,8 @@
                 });
                  }
             });
+            // Await connections from others
+            peer.on('connection', dataConnect);
             peer.on('call', function (call) {
                 // Answer the call automatically (instead of prompting user) for demo purposes
                 console.log("Incoming Call");
@@ -175,8 +189,6 @@
             var c = @Model.Count;
             if(c==0){   
             }
-               
-            
             else
             {    
                 $('#infoMessage').text('Select a user to make call');
@@ -258,6 +270,15 @@
                         $('#infoMessage').text("Calling...");
                         step3(call);
 
+                        var c = peer.connect(data.apiKey, {
+                            label: 'co-ordinates',
+                            serialization: 'none',
+                            metadata: {message: 'hi i want to chat with you!'}
+                        });
+                        c.on('open', function() {
+                            dataConnect(c);
+                        });
+                        c.on('error', function(err) { console.log('There was an error') });
                     }
                     else {
                         $('#infoMessage').text("User not available at this moment.");
@@ -281,7 +302,45 @@
         }
     
 
-        
+    //Handling data connections
+        function dataConnect(connection){
+            window.dataConnection = connection;
+            if(connection.label == 'co-ordinates'){
+
+                // when data is recieved.
+                connection.on('data', function(data){
+                    var d = new Date();
+                    console.log(data + " at " + d.getTime());
+                });
+                connection.on('close', function(data){
+                    delete connectedPeers[connection.peer];
+                    window.dataConnection = null;
+                });
+            }
+            else if(connection.label == 'chat'){
+                
+            }
+            connectedPeers[connection.peer] = 1;
+
+        }
+
+        function eachActiveConnection(fn) {
+            var actives = $('.active');
+            var checkedIds = {};
+            actives.each(function() {
+                var peerId = $(this).attr('id');
+
+                if (!checkedIds[peerId]) {
+                    var conns = peer.connections[peerId];
+                    for (var i = 0, ii = conns.length; i < ii; i += 1) {
+                        var conn = conns[i];
+                        fn(conn, $(this));
+                    }
+                }
+
+                checkedIds[peerId] = 1;
+            });
+        }
   </script>
 
 
@@ -350,6 +409,8 @@
 					</a>
 				</center>
             <span id="callText" style="display:block;"></span>
+            <button id="sendCordinates">Move</button>
 		</div>
+        
 	</div>
 <script src="~/Scripts/home.js"></script>
