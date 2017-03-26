@@ -21,7 +21,7 @@
     $(document).ready(function(){
         $('#sendCordinates').on('click', function(){
             var d = new Date();
-            window.dataConnection.send(peer.id + ":"+ d.getTime());
+            window.dataConnection.send(d.getTime());
           
         });
     });
@@ -310,7 +310,10 @@
                 // when data is recieved.
                 connection.on('data', function(data){
                     var d = new Date();
+                    var diff = Number(d.getTime())- Number(data);
+                    $('#stats').append('<td>'+ diff +'</td>');
                     console.log(data + " at " + d.getTime());
+                    
                 });
                 connection.on('close', function(data){
                     delete connectedPeers[connection.peer];
@@ -411,6 +414,10 @@
             <span id="callText" style="display:block;"></span>
             <button id="sendCordinates">Move</button>
 		</div>
-        
+        <table>
+            <tr id="stats">
+                <td></td>
+            </tr>
+        </table>
 	</div>
 <script src="~/Scripts/home.js"></script>
