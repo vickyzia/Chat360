@@ -1,10 +1,12 @@
 ﻿@model List<Chat360Client.Models.UserModel>
 @{
     ViewBag.Title = "Home";
+    var cl = "";
 }
 
  <link rel="stylesheet" href="~/Content/home.css">   
 <script>
+    var Contacts_URL = '@Url.Action("GetOnlineContacts", "Home")';
     // Compatibility shim
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     // PeerJS object
@@ -12,6 +14,7 @@
     var callConnected = false;
     var inCall = false;
     var checkTimeOut = true;
+    var movements = {TOP:1, TR:2,RIGHT:3,BR:4,DOWN:5, BL:6, LEFT:7,TL:8, RESET:9};
     connectPeer();
     
     var connectedPeers = {};
@@ -309,10 +312,8 @@
 
                 // when data is recieved.
                 connection.on('data', function(data){
-                    var d = new Date();
-                    var diff = Number(d.getTime())- Number(data);
-                    $('#stats').append('<td>'+ diff +'</td>');
-                    console.log(data + " at " + d.getTime());
+                    Update(data);
+                    console.log(data);
                     
                 });
                 connection.on('close', function(data){
@@ -344,6 +345,11 @@
                 checkedIds[peerId] = 1;
             });
         }
+        function sendMovementCordinates(val){
+            if(window.dataConnect!=null){
+                window.dataConnect.send(val);
+            }
+        }
   </script>
 
 
@@ -355,7 +361,7 @@
 					@foreach (var user in @Model)
                      {
                         
-                        <a href="#" class="list-group-item" style="border-bottom:1px solid #d2d8df" data-username="@user.username" data-img="@user.imageUrl">
+                        <a href="#" class="list-group-item" style="border-bottom:1px solid #d2d8df; padding: 10px 0px 10px 15px; height:80px;" data-username="@user.username" data-img="@user.imageUrl">
                             
                             @if(string.IsNullOrEmpty(user.imageUrl))
                             {
@@ -367,7 +373,14 @@
 
                             }
 						    <span style="padding:10px;"> @user.username </span>
-                                
+                            @if (user.status)
+                            {
+                                cl = "online-icon";
+                            }
+                            else {
+                                cl = "offline-icon";
+                            }
+                            <span class="current-status pull-right @cl"></span>    
 					    </a>
                     
                      }
@@ -403,6 +416,23 @@
 	<div id="video-container">
 		<video id="their-video" autoplay></video>
         <video id="my-video" muted="true" autoplay></video>
+        <div id="movementButtons">
+            <label id="reset" class="menu_opener_label">Reset</label>
+                  <div id="up" class="arrow link_one link_general"></div>
+                  <button id="right" class="arrow link_two link_general"></button>
+                  <button id="down" class="arrow link_three link_general"></button>
+                  <button id="left" class="arrow link_four link_general"></button>
+                  <button id="tl" class="arrow link_top_left link_general_left"></button>
+                  <button id="tr" class="arrow link_top_right link_general_right"></button>
+                  <button id="bl" class="arrow link_bottom_left link_general_left"></button>
+                  <button id="br" class="arrow link_bottom_right link_general_right"></button>
+            <a  class="btn btn-primary btn-xlg" id="connectButton" style="padding:10px;">
+
+
+						Connect Device
+					</a>
+
+        </div>
 		<div id=disconnectCall>
 			<center>
 				<a  class="btn btn-primary btn-xlg" onclick="return step2()" style="padding:20px;background-color:red; margin-top:10px;">
@@ -411,13 +441,8 @@
 						Disconnect
 					</a>
 				</center>
-            <span id="callText" style="display:block;"></span>
-            <button id="sendCordinates">Move</button>
+            <span id="callText" style="display:block;"></span>  
 		</div>
-        <table>
-            <tr id="stats">
-                <td></td>
-            </tr>
-        </table>
+        
 	</div>
 <script src="~/Scripts/home.js"></script>

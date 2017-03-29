@@ -515,3 +515,125 @@ body {
 	margin-right: 25px;
 }
 
+.online-icon {
+    background: rgb(66, 183, 42) none repeat scroll 0% 0%;
+    border-radius: 50%;
+    display: inline-block;
+    height: 12px;
+    margin-left: 4px;
+    width: 12px;  
+    margin-top:24px;
+    margin-right:10px;
+}
+.offline-icon {
+    background: #ddd none repeat scroll 0% 0%;
+    border-radius: 50%;
+    display: inline-block;
+    height: 12px;
+    margin-left: 4px;
+    width: 12px;  
+    margin-top:24px;
+    margin-right:10px;
+}
+
+.menu_opener {
+  display: none;
+}
+
+#connectButton {
+    background: #f1c40f;
+    top: 150px;
+      left: 12px; 
+      position: absolute;
+}
+.menu_opener_label {
+  background: #f1c40f;
+  width: 60px;
+  height: 60px;
+  display: block;
+  cursor: pointer;
+  border-radius: 50%;
+  position: absolute;
+  top: 50px;
+  left: 50px;   
+  z-index: 10;
+  padding-top:18px;
+  text-align:center;
+}
+
+.link_general {
+  width: 30px;
+  height: 30px;
+  display: block;
+  border-radius: 50%;
+  position: absolute;
+  top: 65px;
+  left: 65px;
+  background: #ecf0f1;
+    background-size:20px !important;
+    border-color:#f1c40f;
+    border-style:none;
+}
+.link_general_left {
+    width: 30px;
+    height: 30px;
+    display: block;
+    border-radius: 50%;
+    position: absolute;
+    left: 30px;
+    background: #ecf0f1;
+    background-size:30px !important;
+    border-color:#f1c40f;
+    border-style:none;
+    
+}
+.link_general_right {
+    width: 30px;
+    height: 30px;
+    display: block;
+    border-radius: 50%;
+    position: absolute;
+    left: 100px;
+    background: #ecf0f1;
+    background-size:30px !important;
+    border-color:#f1c40f;
+    border-style:none;
+    
+}
+
+.link_one {
+  top: 18px;
+  background: url(../Images/arrow-up.png) #f1c40f no-repeat center center;
+}
+
+.link_two {
+     left: 112px;
+  background: url(../Images/arrow-right.png) #f1c40f no-repeat center center;
+}
+
+.link_three {
+    top: 112px;
+  background: url(../Images/arrow-down.png) #f1c40f no-repeat center center;
+}
+
+.link_four {
+     left: 18px; 
+  background: url(../Images/arrow-left.png) #f1c40f no-repeat center center;
+}
+.link_top_left {
+    top:30px;
+     background: url(../Images/arrow-top-left.png) #f1c40f no-repeat center center;
+}
+.link_top_right {
+    top:30px;
+    background: url(../Images/arrow-top-right.png) #f1c40f no-repeat center center;
+}
+.link_bottom_left {
+    top:100px;
+    background: url(../Images/arrow-bottom-left.png) #f1c40f no-repeat center center;  
+}
+.link_bottom_right {
+    top:100px;
+    background: url(../Images/arrow-bottom-right.png) #f1c40f no-repeat center center;
+}
+
