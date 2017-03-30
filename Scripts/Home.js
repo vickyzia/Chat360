@@ -125,14 +125,14 @@ $(document).ready()
     });
 }
 
-        function Update() {
+        function Update(value) {
             if (!port) {
                 return;
             }
 
             let view = new Uint8Array(1);
 
-            view[0]= 20; //assign the value to be sent , here
+            view[0]= value; //assign the value to be sent , here
             port.send(view);
         };
 }
