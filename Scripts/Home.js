@@ -54,30 +54,9 @@ $(document).ready()
     $('.arrow').mouseup(function (element) {
 
         var target = element.currentTarget;
-        if (target.id == 'up') {
-            window.dataConnection.send(-movements.TOP);
-        }
-        else if (target.id == 'down') {
-            window.dataConnection.send(-movements.DOWN);
-        }
-        else if (target.id == 'right') {
-            window.dataConnection.send(-movements.RIGHT);
-        }
-        else if (target.id == 'left') {
-            window.dataConnection.send(-movements.LEFT);
-        }
-        else if (target.id == 'tl') {
-            window.dataConnection.send(-movements.TL);
-        }
-        else if (target.id == 'tr') {
-            window.dataConnection.send(-movements.TR);
-        }
-        else if (target.id == 'bl') {
-            window.dataConnection.send(-movements.BL);
-        }
-        else if (target.id == 'br') {
-            window.dataConnection.send(-movements.BR);
-        }
+            window.dataConnection.send(movements.RESET);
+
+
     });
     $('#reset').on('click', function () {
         window.dataConnection.send(movements.RESET);
