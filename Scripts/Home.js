@@ -71,9 +71,10 @@ $(document).ready()
     $('#connectButton').on('click', function () {
         if (port) {
             port.disconnect();
-            $('#connectButton').text = 'Disconnect';
+            $('#connectButton').text('Disconnect Device');
             port = null;
         } else {
+            $('#connectButton').text('Connect Device');
             serial.requestPort().then(selectedPort => {
                 port = selectedPort;
             connect();
@@ -83,7 +84,7 @@ $(document).ready()
     });
     function connect() {
         port.connect().then(() => {
-        $('#connectButton').text = 'Disconnect';
+        $('#connectButton').text('Disconnect Device');
         port.onReceive = data => {
             let textDecoder = new TextDecoder();
         console.log(textDecoder.decode(data));
