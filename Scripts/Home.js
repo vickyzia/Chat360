@@ -14,6 +14,9 @@ $(document).ready()
         $that.parent().find('a').removeClass('active');
         $that.addClass('active');
         var val = $that.attr("data-username");
+        var image = $that.attr("data-img");
+        var name = $that.attr("data-name");
+        var about = $that.attr("data-about");
         var img = $that.parent().find('img').attr("src");
         selectedUser = val;
         console.log(val);
@@ -21,6 +24,9 @@ $(document).ready()
         $('#img-circle').attr('src', img);
         $('#infoMessage').text('Click To Call');
         $('#username').text(val);
+        $('#username').css('textTransform', 'capitalize');
+        $('#name').text(name);
+        $('#about').text(about);
     });
 
     $('.arrow').mousedown(function (element) {
@@ -114,7 +120,7 @@ $(document).ready()
 
             view[0]= value; //assign the value to be sent , here
             port.send(view);
-        };
+        }
 }
 function GetOnlineContacts() {
 
@@ -135,4 +141,85 @@ function GetOnlineContacts() {
             }
         }
     });
+}
+
+function InitializeTracking(){
+    var videoInput = document.getElementById('their-video');
+    var canvas = document.getElementById('overlay');
+    var context = canvas.getContext('2d');
+
+    var tracker = new tracking.ObjectTracker('face');
+    tracker.setInitialScale(4);
+    tracker.setStepSize(2);
+    tracker.setEdgesDensity(0.1);
+
+    tracking.track('#their-video', tracker, { camera: true });
+    tracker.on('track', function(event) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        event.data.forEach(function(rect) {
+            context.strokeStyle = '#a64ceb';
+            context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+            context.font = '11px Helvetica';
+            context.fillStyle = "#fff";
+            context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+            context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+        });
+    });
+
+    //var htracker = new headtrackr.Tracker();
+    ////To get the different statuses of the tracking being done.
+    //document.addEventListener('headtrackrStatus', 
+    //      function (event) {
+    //          if (event.status == "getUserMedia") {
+                  
+    //          }
+    //          else if(event.status == "found"){
+
+    //          }
+    //          else if(event.status == "lost"){
+              
+    //          }
+    //      });
+    //document.addEventListener('facetrackingEvent', function (event) {
+    //    console.log("event x: " + event.x);
+    //    console.log("event y: "+ event.y);
+
+    //});
+    ////document.addEventListener('headtrackingEvent',function (event) {
+
+    ////});
+
+    //htracker.init(videoInput, canvasInput);
+    //htracker.start();
+}
+function CalculateMovementDirection(x, y){
+    if(x>320 || x<360 || y <220 || y>260){
+        // if this is the case then movement is required to reach within this rectangle which we consider the center
+        if(x>360 && y>260){
+            //movements.BR
+        }
+        else if(x> 360 && y<220){
+           // movements.TR;
+        }
+        else if(x > 360 && y>=220 && y<=260){
+           // movements.RIGHT;
+        }
+        else if(x<320 && y>260){
+            //movements.TL
+        }
+        else if(x< 320 && y<220){
+            // movements.BL;
+        }
+        else if(x < 320 && y>=220 && y<=260){
+            // movements.LEFT;
+        }
+        else if(x >= 320 && x<=360 && y>260){
+            // movements.DOWN;
+        }
+        else if(x >= 320 && x<=360 && y<220){
+            // movements.LEFT;
+        }
+
+    }
+
 }

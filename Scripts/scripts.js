@@ -83,7 +83,7 @@ jQuery(document).ready(function () {
 
 
     });
-    $('#reg-form-username').on("blur",
+    $('#reg-form-username.').on("blur",
       function (value, element) {
           var result = false;
           console.log('in validation');

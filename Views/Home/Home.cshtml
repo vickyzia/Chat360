@@ -4,7 +4,11 @@
     var cl = "";
 }
 
- <link rel="stylesheet" href="~/Content/home.css">   
+     <link rel="stylesheet" href="~/Content/home.css">   
+     <script type="text/javascript" src="~/Scripts/headtrackr.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/tracking-min.js"></script>
+    <script type="text/javascript" src="~/Scripts/face-min.js"></script>
+
 <script>
     var Contacts_URL = '@Url.Action("GetOnlineContacts", "Home")';
     // Compatibility shim
@@ -25,8 +29,8 @@
         $('#sendCordinates').on('click', function(){
             var d = new Date();
             window.dataConnection.send(d.getTime());
-          
         });
+
     });
     setInterval(function () {
         if (window.existingCall != null && window.existingCall.open == true) {
@@ -98,6 +102,8 @@
             
             if(window.dataConnection!=null)
                 window.dataConnection.close();
+            if(window.chatConnection!=null)
+                window.chatConnection.close();
             peer = new Peer({host: 'chat-360.herokuapp.com', secure: true, port: 443, key: 'peerjs', debug: 3 });
            
             peer.on('open', function() {
@@ -126,6 +132,8 @@
                             $('#callText').text('Currently in call with ' + data.username);
                             $('#mainPage').hide();
                             $('#mainNav').hide();
+                            $('#page-top').css('padding-top','0px');
+                            InitializeTracking();
                         }
                         else {
                             //reject call
@@ -185,6 +193,7 @@
             $('#step2').show();
             $('#mainPage').show();
             $('#mainNav').show();
+            $('#page-top').css('padding-top','51px');
             console.log("Call Closed");
             $('#video-container').hide();
             $('.list-group').find('a').removeClass('active');
@@ -213,6 +222,7 @@
                     $('#their-video').prop('src', URL.createObjectURL(stream));
                     $('#mainPage').hide();
                     $('#mainNav').hide();
+                    $('#page-top').css('padding-top','0px');
                     $('#video-container').show();
                     $('#infoMessage').text('');
                     callConnected = true;
@@ -282,6 +292,15 @@
                             dataConnect(c);
                         });
                         c.on('error', function(err) { console.log('There was an error') });
+                        //For chat
+                        var chat = peer.connect(data.apiKey, {
+                            label: 'chat',
+                            serialization: 'none',
+                            metadata: {message: 'this is chat'}});
+                        chat.on('open', function() {
+                            dataConnect(chat);
+                        });
+                        chat.on('error', function(err) { console.log('There was an error') });
                     }
                     else {
                         $('#infoMessage').text("User not available at this moment.");
@@ -307,9 +326,9 @@
 
     //Handling data connections
         function dataConnect(connection){
-            window.dataConnection = connection;
+            
             if(connection.label == 'co-ordinates'){
-
+                window.dataConnection = connection;
                 // when data is recieved.
                 connection.on('data', function(data){
                     Update(data);
@@ -322,7 +341,15 @@
                 });
             }
             else if(connection.label == 'chat'){
-                
+                window.chatConnection = connection;
+                connection.on('data', function(data){
+                    sendMessage(data, 'left');
+                    
+                });
+                connection.on('close', function(data){
+                    delete connectedPeers[connection.peer];
+                    window.chatConnection = null;
+                });
             }
             connectedPeers[connection.peer] = 1;
 
@@ -361,7 +388,7 @@
 					@foreach (var user in @Model)
                      {
                         
-                        <a href="#" class="list-group-item" style="border-bottom:1px solid #d2d8df; padding: 10px 0px 10px 15px; height:80px;" data-username="@user.username" data-img="@user.imageUrl">
+                        <a href="#" class="list-group-item" style="border-bottom:1px solid #d2d8df; padding: 10px 0px 10px 15px; height:80px;" data-username="@user.username" data-img="@user.imageUrl" data-name="@string.Concat(user.firstName, " "+user.lastName)" data-about="@user.aboutme">
                             
                             @if(string.IsNullOrEmpty(user.imageUrl))
                             {
@@ -389,10 +416,13 @@
 			</div>
 		
 			<div  class="span3 col-xs-7 col-sm-9 col-md-9 col-lg-9" style="max-height:92vh;">
+
 				<center id="center" style="padding-top:50px">
                     <div id="centerDiv">
 					    <img src="" name="aboutme" width="140" height="140" id="img-circle" class="img-circle">
-					    <h3 id="username"></h3>
+					    <h2 id="username" style="border-bottom:1px solid #bbb; max-width:200px; padding-bottom:10px;"></h2>
+                        <span id="name" style="max-width:200px;"></span>
+                        <p id="about" style=" max-width:400px;word-wrap: break-word"></p>
 					    <a class="btn btn-primary btn-xlg"  onclick="return makeCall(selectedUser)" style="padding:20px;background-color:green; margin-top:10px;">
 						    <span class="glyphicon glyphicon-earphone" style="padding-left:5px; padding-right:5px;"></span>
 						    Call
@@ -414,8 +444,9 @@
 
 		 
 	<div id="video-container">
-		<video id="their-video" autoplay></video>
-        <video id="my-video" muted="true" autoplay></video>
+		<video id="their-video" width="640" height="480" autoplay></video>
+        <video id="my-video" width="320" height="240" muted="true" autoplay></video>
+        <canvas id="overlay" width="640" height="480"></canvas>
         <div id="movementButtons">
             <label id="reset" class="menu_opener_label">Reset</label>
                   <button id="up" class="arrow link_one link_general"></button>
@@ -427,7 +458,6 @@
                   <button id="bl" class="arrow link_bottom_left link_general_left"></button>
                   <button id="br" class="arrow link_bottom_right link_general_right"></button>
             <a  class="btn btn-primary btn-xlg" id="connectButton" style="padding:10px;">
-
 
 						Connect Device
 					</a>
@@ -443,6 +473,68 @@
 				</center>
             <span id="callText" style="display:block;"></span>  
 		</div>
+ 
+            <div class="chat_window"><div class="top_menu" style="display:none;"><div ><div ></div><div ></div><div ></div></div><div class="title">Chat</div></div><ul class="messages"></ul><div class="bottom_wrapper clearfix"><div class="message_input_wrapper"><input class="message_input" placeholder="Type your message here..." /></div><div class="send_message"><div class="icon"></div><div class="text">Send</div></div></div></div><div class="message_template"><li class="message"><div class="avatar"></div><div class="text_wrapper"><div class="text"></div></div></li></div>
+    <script type="text/javascript">
+       
+            var Message;
+            Message = function (arg) {
+                this.text = arg.text, this.message_side = arg.message_side;
+                this.draw = function (_this) {
+                    return function () {
+                        var $message;
+                        $message = $($('.message_template').clone().html());
+                        $message.addClass(_this.message_side).find('.text').html(_this.text);
+                        $('.messages').append($message);
+                        return setTimeout(function () {
+                            return $message.addClass('appeared');
+                        }, 0);
+                    };
+                }(this);
+                return this;
+            };
+            
+                var getMessageText, message_side, sendMessage;
+                message_side = 'right';
+                getMessageText = function () {
+                    var $message_input;
+                    $message_input = $('.message_input');
+                    return $message_input.val();
+                };
+                sendMessage = function (text, side) {
+                    var $messages, message;
+                    if (text.trim() === '') {
+                        return;
+                    }
+                    $('.message_input').val('');
+                    $messages = $('.messages');
+                    message_side = side;
+                    message = new Message({
+                        text: text,
+                        message_side: message_side
+                    });
+                    message.draw();
+                    return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
+                };
+                $('.send_message').click(function (e) {
+                    sendChat(getMessageText());
+                    return sendMessage(getMessageText(),'right');
+                });
+                $('.message_input').keyup(function (e) {
+                    if (e.which === 13) {
+                        sendChat(getMessageText());
+                        return sendMessage(getMessageText(),'right');
+                    }
+                });
+            
         
-	</div>
+      
+        function sendChat(text){
+            if(window.chatConnection!=null)
+                window.chatConnection.send(text);
+        }
+        
+    </script>
+
+        </div>
 <script src="~/Scripts/home.js"></script>
