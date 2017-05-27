@@ -62,7 +62,7 @@
           <div class="form-group">
               <label class="col-lg-3 control-label">username:</label>
               <div class="col-lg-8">
-                @Html.TextBoxFor(x => x.username, Model.username, new { type = "text", @class = "form-control", placeholder = "Username" })
+                @Html.TextBoxFor(x => x.username, Model.username, new { type = "text", @class = "form-control", placeholder = "Username" , disabled="disabled"})
                 @Html.ValidationMessageFor(x => x.username, null, new { style="color: red"})
               </div>
            </div>
