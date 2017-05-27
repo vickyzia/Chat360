@@ -133,7 +133,7 @@
                             $('#mainPage').hide();
                             $('#mainNav').hide();
                             $('#page-top').css('padding-top','0px');
-                            InitializeTracking();
+                            //InitializeTracking();
                         }
                         else {
                             //reject call
@@ -227,7 +227,7 @@
                     $('#infoMessage').text('');
                     callConnected = true;
                     checkTimeOut = false;
-
+                    InitializeTracking();
                 });
                 call.on('error', function (error) {
                     console.log(error);
