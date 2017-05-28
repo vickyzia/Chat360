@@ -19,6 +19,8 @@
     var inCall = false;
     var checkTimeOut = true;
     var movements = {TOP:1, TR:2,RIGHT:3,BR:4,DOWN:5, BL:6, LEFT:7,TL:8, RESET:9};
+    var Modes = {FaceDetect:1, Controls:2};
+    var currentMode = Modes.Controls;
     connectPeer();
     
     var connectedPeers = {};
@@ -133,7 +135,6 @@
                             $('#mainPage').hide();
                             $('#mainNav').hide();
                             $('#page-top').css('padding-top','0px');
-                            //InitializeTracking();
                         }
                         else {
                             //reject call
@@ -198,6 +199,13 @@
             $('#video-container').hide();
             $('.list-group').find('a').removeClass('active');
             $('#centerDiv').hide();
+            $('#ChangeMode').html('Controls');
+            $('#ChangeMode').css('padding-top','23px');
+            currentMode = Modes.Controls;
+            if(tracketTask!=null){
+                tracketTask.stop();
+            }
+            $('.messages').empty();
             var c = @Model.Count;
             if(c==0){   
             }
@@ -331,8 +339,9 @@
                 window.dataConnection = connection;
                 // when data is recieved.
                 connection.on('data', function(data){
-                    Update(data);
                     console.log(data);
+                    Update(data);
+                    
                     
                 });
                 connection.on('close', function(data){
@@ -448,7 +457,7 @@
         <video id="my-video" width="320" height="240" muted="true" autoplay></video>
         <canvas id="overlay" width="640" height="480"></canvas>
         <div id="movementButtons">
-            <label id="reset" class="menu_opener_label">Reset</label>
+            <label id="ChangeMode" class="menu_opener_label" title="Click To Change Mode">Controls</label>
                   <button id="up" class="arrow link_one link_general"></button>
                   <button id="right" class="arrow link_two link_general"></button>
                   <button id="down" class="arrow link_three link_general"></button>

@@ -1,5 +1,6 @@
 ﻿var selectedUser = "";
 let port;
+var tracketTask ;
 $(document).ready()
 {
     $('#video-container').hide();
@@ -31,41 +32,60 @@ $(document).ready()
 
     $('.arrow').mousedown(function (element) {
 
-        var target = element.currentTarget;
-        if (target.id == 'up') {
-            window.dataConnection.send(movements.TOP);
-        }
-        else if (target.id == 'down') {
-            window.dataConnection.send(movements.DOWN);
-        }
-        else if (target.id == 'right') {
-            window.dataConnection.send(movements.RIGHT);
-        }
-        else if (target.id == 'left') {
-            window.dataConnection.send(movements.LEFT);
-        }
-        else if (target.id == 'tl') {
-            window.dataConnection.send(movements.TL);
-        }
-        else if (target.id == 'tr') {
-            window.dataConnection.send(movements.TR);
-        }
-        else if (target.id == 'bl') {
-            window.dataConnection.send(movements.BL);
-        }
-        else if (target.id == 'br') {
-            window.dataConnection.send(movements.BR);
+        if(currentMode == Modes.Controls){
+            var target = element.currentTarget;
+            if (target.id == 'up') {
+                window.dataConnection.send(movements.TOP);
+            }
+            else if (target.id == 'down') {
+                window.dataConnection.send(movements.DOWN);
+            }
+            else if (target.id == 'right') {
+                window.dataConnection.send(movements.RIGHT);
+            }
+            else if (target.id == 'left') {
+                window.dataConnection.send(movements.LEFT);
+            }
+            else if (target.id == 'tl') {
+                window.dataConnection.send(movements.TL);
+            }
+            else if (target.id == 'tr') {
+                window.dataConnection.send(movements.TR);
+            }
+            else if (target.id == 'bl') {
+                window.dataConnection.send(movements.BL);
+            }
+            else if (target.id == 'br') {
+                window.dataConnection.send(movements.BR);
+            }
         }
     });
     $('.arrow').mouseup(function (element) {
-
-        var target = element.currentTarget;
+        if(currentMode == Modes.Controls){
+            var target = element.currentTarget;
             window.dataConnection.send(movements.RESET);
-
+        }
 
     });
-    $('#reset').on('click', function () {
-        window.dataConnection.send(movements.RESET);
+    $('#ChangeMode').on('click', function () {
+        var val = $('#ChangeMode').html();
+        if(val == 'Controls'){
+            $('#ChangeMode').html('Face Detect');
+            $('#ChangeMode').css('padding-top','18px');
+            if(tracketTask!=null){
+                tracketTask.run();
+            }
+        }
+        else if(val == 'Face Detect'){
+            $('#ChangeMode').html('Controls');
+            $('#ChangeMode').css('padding-top','23px');
+            var canvas = document.getElementById('overlay');
+            var context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            currentMode
+            if(tracketTask!=null)
+                tracketTask.stop();
+        }
     });
     //Get Online Users after every minute.
     window.setInterval(function () {
@@ -153,18 +173,29 @@ function InitializeTracking(){
     tracker.setStepSize(2);
     tracker.setEdgesDensity(0.1);
 
-    tracking.track('#their-video', tracker);
+    tracketTask = tracking.track('#their-video', tracker);
     tracker.on('track', function(event) {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        event.data.forEach(function(rect) {
+
+        if(event.data.length>0){
+            var rect = event.data[0];
+            var midX = GetCenterX(rect.x,rect.width);
+            var midY = GetCenterY(rect.y,rect.height);
+            var movement = CalculateMovementDirection(midX,midY);
+            window.dataConnection.send(movement);
             context.strokeStyle = '#a64ceb';
             context.strokeRect(rect.x, rect.y, rect.width, rect.height);
             context.font = '11px Helvetica';
             context.fillStyle = "#fff";
             context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
             context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
-        });
+        }
+        else{
+            window.dataConnection.send(movements.RESET);
+
+        }
     });
+    tracketTask.stop();
 
     //var htracker = new headtrackr.Tracker();
     ////To get the different statuses of the tracking being done.
@@ -192,34 +223,43 @@ function InitializeTracking(){
     //htracker.init(videoInput, canvasInput);
     //htracker.start();
 }
+function GetCenterX(x,width){
+    return x+(1/2)*width;
+}
+function GetCenterY(y, height){
+    return y + (1/2)*height;
+}
 function CalculateMovementDirection(x, y){
-    if(x>320 || x<360 || y <220 || y>260){
+    if(x<320 || x>360 || y <220 || y>260){
         // if this is the case then movement is required to reach within this rectangle which we consider the center
         if(x>360 && y>260){
-            //movements.BR
+            return movements.BR;
         }
         else if(x> 360 && y<220){
-           // movements.TR;
+            return movements.TR;
         }
         else if(x > 360 && y>=220 && y<=260){
-           // movements.RIGHT;
+            return movements.RIGHT;
         }
         else if(x<320 && y>260){
-            //movements.TL
+            return movements.TL
         }
         else if(x< 320 && y<220){
-            // movements.BL;
+            return movements.BL;
         }
         else if(x < 320 && y>=220 && y<=260){
-            // movements.LEFT;
+            return movements.LEFT;
         }
         else if(x >= 320 && x<=360 && y>260){
-            // movements.DOWN;
+            return movements.DOWN;
         }
         else if(x >= 320 && x<=360 && y<220){
-            // movements.LEFT;
+            return  movements.TOP;
         }
 
+    }
+    else{
+        return movements.RESET;
     }
 
 }
