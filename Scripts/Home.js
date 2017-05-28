@@ -21,7 +21,7 @@ $(document).ready()
         selectedUser = val;
         console.log(val);
         $('#centerDiv').show();
-        $('#img-circle').attr('src', img);
+        $('#img-circle').attr('src', image);
         $('#infoMessage').text('Click To Call');
         $('#username').text(val);
         $('#username').css('textTransform', 'capitalize');
