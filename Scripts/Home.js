@@ -153,7 +153,7 @@ function InitializeTracking(){
     tracker.setStepSize(2);
     tracker.setEdgesDensity(0.1);
 
-    tracking.track('#their-video', tracker, { camera: true });
+    tracking.track('#their-video', tracker);
     tracker.on('track', function(event) {
         context.clearRect(0, 0, canvas.width, canvas.height);
         event.data.forEach(function(rect) {
