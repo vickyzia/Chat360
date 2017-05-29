@@ -516,7 +516,6 @@
                     if (text.trim() === '') {
                         return;
                     }
-                    $('.message_input').val('');
                     $messages = $('.messages');
                     message_side = side;
                     message = new Message({
@@ -527,10 +526,12 @@
                     return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
                 };
                 $('.send_message').click(function (e) {
+                    $('.message_input').val('');
                     sendChat(getMessageText());
                     return sendMessage(getMessageText(),'right');
                 });
                 $('.message_input').keyup(function (e) {
+                    $('.message_input').val('');
                     if (e.which === 13) {
                         sendChat(getMessageText());
                         return sendMessage(getMessageText(),'right');
