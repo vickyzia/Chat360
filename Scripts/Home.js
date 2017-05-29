@@ -72,6 +72,7 @@ $(document).ready()
         if(val == 'Controls'){
             $('#ChangeMode').html('Face Detect');
             $('#ChangeMode').css('padding-top','18px');
+            currentMode = Modes.FaceDetect;
             if(tracketTask!=null){
                 tracketTask.run();
             }
@@ -82,7 +83,7 @@ $(document).ready()
             var canvas = document.getElementById('overlay');
             var context = canvas.getContext('2d');
             context.clearRect(0, 0, canvas.width, canvas.height);
-            currentMode
+            currentMode = Modes.Controls;
             if(tracketTask!=null)
                 tracketTask.stop();
         }
