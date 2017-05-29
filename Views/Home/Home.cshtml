@@ -531,8 +531,9 @@
                     return sendMessage(getMessageText(),'right');
                 });
                 $('.message_input').keyup(function (e) {
-                    $('.message_input').val('');
+  
                     if (e.which === 13) {
+                        $('.message_input').val('');
                         sendChat(getMessageText());
                         return sendMessage(getMessageText(),'right');
                     }
