@@ -243,10 +243,10 @@ function CalculateMovementDirection(x, y){
             return facemovements.RIGHT;
         }
         else if(x<320 && y>260){
-            return facemovements.TL
+            return facemovements.BL
         }
         else if(x< 320 && y<220){
-            return facemovements.BL;
+            return facemovements.TL;
         }
         else if(x < 320 && y>=220 && y<=260){
             return facemovements.LEFT;
