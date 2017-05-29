@@ -231,30 +231,30 @@ function GetCenterY(y, height){
     return y + (1/2)*height;
 }
 function CalculateMovementDirection(x, y){
-    if(x<320 || x>360 || y <220 || y>260){
+    if(x<300 || x>380 || y <210 || y>270){
         // if this is the case then movement is required to reach within this rectangle which we consider the center
-        if(x>360 && y>260){
+        if(x>380 && y>270){
             return facemovements.BR;
         }
-        else if(x> 360 && y<220){
+        else if(x> 380 && y<210){
             return facemovements.TR;
         }
-        else if(x > 360 && y>=220 && y<=260){
+        else if(x > 380 && y>=210 && y<=270){
             return facemovements.RIGHT;
         }
-        else if(x<320 && y>260){
+        else if(x<300 && y>270){
             return facemovements.BL
         }
-        else if(x< 320 && y<220){
+        else if(x< 300 && y<210){
             return facemovements.TL;
         }
-        else if(x < 320 && y>=220 && y<=260){
+        else if(x < 300 && y>=210 && y<=270){
             return facemovements.LEFT;
         }
-        else if(x >= 320 && x<=360 && y>260){
+        else if(x >= 300 && x<=380 && y>270){
             return facemovements.DOWN;
         }
-        else if(x >= 320 && x<=360 && y<220){
+        else if(x >= 300 && x<=380 && y<210){
             return  facemovements.TOP;
         }
 
