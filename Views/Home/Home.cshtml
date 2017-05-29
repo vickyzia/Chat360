@@ -526,16 +526,19 @@
                     return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
                 };
                 $('.send_message').click(function (e) {
+                    var m = getMessageText();
+                    sendChat(m);
                     $('.message_input').val('');
-                    sendChat(getMessageText());
-                    return sendMessage(getMessageText(),'right');
+                    return sendMessage(m,'right');
                 });
                 $('.message_input').keyup(function (e) {
   
                     if (e.which === 13) {
+
+                        var m = getMessageText();
+                        sendChat(m);
                         $('.message_input').val('');
-                        sendChat(getMessageText());
-                        return sendMessage(getMessageText(),'right');
+                        return sendMessage(m,'right');
                     }
                 });
             
