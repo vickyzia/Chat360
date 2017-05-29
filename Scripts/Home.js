@@ -183,7 +183,6 @@ function InitializeTracking(){
             var midY = GetCenterY(rect.y,rect.height);
             var movement = CalculateMovementDirection(midX,midY);
             window.dataConnection.send(movement);
-            window.dataConnection.send(movements.RESET);
             context.strokeStyle = '#a64ceb';
             context.strokeRect(rect.x, rect.y, rect.width, rect.height);
             context.font = '11px Helvetica';
