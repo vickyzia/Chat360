@@ -183,6 +183,7 @@ function InitializeTracking(){
             var midY = GetCenterY(rect.y,rect.height);
             var movement = CalculateMovementDirection(midX,midY);
             window.dataConnection.send(movement);
+            window.dataConnection.send(movements.RESET);
             context.strokeStyle = '#a64ceb';
             context.strokeRect(rect.x, rect.y, rect.width, rect.height);
             context.font = '11px Helvetica';
@@ -233,28 +234,28 @@ function CalculateMovementDirection(x, y){
     if(x<320 || x>360 || y <220 || y>260){
         // if this is the case then movement is required to reach within this rectangle which we consider the center
         if(x>360 && y>260){
-            return movements.BR;
+            return facemovements.BR;
         }
         else if(x> 360 && y<220){
-            return movements.TR;
+            return facemovements.TR;
         }
         else if(x > 360 && y>=220 && y<=260){
-            return movements.RIGHT;
+            return facemovements.RIGHT;
         }
         else if(x<320 && y>260){
-            return movements.TL
+            return facemovements.TL
         }
         else if(x< 320 && y<220){
-            return movements.BL;
+            return facemovements.BL;
         }
         else if(x < 320 && y>=220 && y<=260){
-            return movements.LEFT;
+            return facemovements.LEFT;
         }
         else if(x >= 320 && x<=360 && y>260){
-            return movements.DOWN;
+            return facemovements.DOWN;
         }
         else if(x >= 320 && x<=360 && y<220){
-            return  movements.TOP;
+            return  facemovements.TOP;
         }
 
     }
